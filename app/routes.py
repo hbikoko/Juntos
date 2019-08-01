@@ -1,23 +1,20 @@
-import os
+import os 
+# this is my juntos project
 from app import app
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, session, url_for
 
-events = [
-        {"event":"First Day of Classes", "date":"2019-08-21"},
-        {"event":"Winter Break", "date":"2019-12-20"},
-        {"event":"Finals Begin", "date":"2019-12-01"}
-    ]
+app.secret_key = b'\xfe\xd9\xb5\xdd\xec\x03\xf4GT\xa9\xccA\xf8\xa2\xb0\x80'
 
 
-# from flask_pymongo import PyMongo
+from flask_pymongo import PyMongo
 
 # name of database
-# app.config['MONGO_DBNAME'] = 'database-name' 
+app.config['MONGO_DBNAME'] = 'social_network' 
 
 # URI of database
-# app.config['MONGO_URI'] = 'mongo-uri' 
+app.config['MONGO_URI'] = 'mongodb+srv://admin2:B69f7f4X5TWCLjb@cluster0-zdqji.mongodb.net/social_network?retryWrites=true&w=majority' 
 
-# mongo = PyMongo(app)
+mongo = PyMongo(app)
 
 
 # INDEX
@@ -26,17 +23,29 @@ events = [
 @app.route('/index')
 
 def index():
-    return render_template('index.html', events = events)
+     #connect to the database
+    collection = mongo.db.users
+    #pull data from database
+    events = collection.find({}).sort("date", -1)
+    #use data
+    return render_template('index.html')
 
 
 # CONNECT TO DB, ADD DATA
 
-@app.route('/add')
+@app.route('/signuppage', methods=['GET','POST'])
 
-def add():
-    # connect to the database
+@app.route('/signup', methods=['GET','POST'])
+def signup():
+    if request.method == "POST":
+        #take in the info they gave us, check if username is taken, if username is available then put into a database of users
+        users = mongo.db.users
+        existing_user = users.find_one({"username":request.form['username']})
+        if existing_user is None:
+            users.insert({"username":request.form['username'], "password": request.form['password']})
+            return render_template ('signup.html')
+        else: 
+            return "That username is taken. Try logging in, or try a different username"
+    else:
+        return render_template('signuppage.html')  
 
-    # insert new data
-
-    # return a message to the user
-    return ""
