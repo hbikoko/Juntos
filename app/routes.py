@@ -30,12 +30,13 @@ def index():
     #use data
     return render_template('index.html')
 
-
 # CONNECT TO DB, ADD DATA
 
 @app.route('/signuppage', methods=['GET','POST'])
 
 @app.route('/signup', methods=['GET','POST'])
+
+# @app.route('/feed', methods=['GET', 'POST'])
 def signup():
     if request.method == "POST":
         #take in the info they gave us, check if username is taken, if username is available then put into a database of users
@@ -48,4 +49,27 @@ def signup():
             return "That username is taken. Try logging in, or try a different username"
     else:
         return render_template('signuppage.html')  
+
+@app.route('/feed', methods=['GET', 'POST'])
+
+def feed():
+    #connect to database
+    collection = mongo.db.users
+    #Pull data 
+    events = collection.find({}).sort("date", -1)
+    #use data
+    return render_template('feed.html')
+
+#s def feed():
+#     if request.method == "POST":
+#         #take in the info they gave us, check if username is taken, if username is available then put into a database of users
+#         users = mongo.db.users
+#         existing_user = users.find_one({"username":request.form['username']})
+#         if existing_user is None:
+#             users.insert({"username":request.form['username'], "password": request.form['password']})
+#             return render_template ('feed.html')
+#         else: 
+#             return "That username is taken. Try logging in, or try a different username"
+#     else:
+#         return render_template('feed.html')  
 
