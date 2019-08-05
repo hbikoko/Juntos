@@ -34,9 +34,6 @@ def index():
 
 @app.route('/signuppage', methods=['GET','POST'])
 
-@app.route('/signup', methods=['GET','POST'])
-
-# @app.route('/feed', methods=['GET', 'POST'])
 def signup():
     if request.method == "POST":
         #take in the info they gave us, check if username is taken, if username is available then put into a database of users
@@ -44,12 +41,13 @@ def signup():
         existing_user = users.find_one({"username":request.form['username']})
         if existing_user is None:
             users.insert({"username":request.form['username'], "password": request.form['password']})
-            return render_template ('signup.html')
+            return render_template ('feed.html')
         else: 
             return "That username is taken. Try logging in, or try a different username"
     else:
-        return render_template('signuppage.html')  
+        return render_template ('signuppage.html')
 
+        
 @app.route('/feed', methods=['GET', 'POST'])
 
 def feed():
@@ -60,6 +58,30 @@ def feed():
     #use data
     return render_template('feed.html')
 
+# LOG IN
+@app.route('/login', methods=['POST', 'GET'])
+
+def login():
+    if request.method == "POST":
+        #take in the info they gave us, check if username is taken, if username is available then put into a database of users
+        users = mongo.db.users
+        existing_user = users.find_one({"username":request.form['username']})
+        if existing_user is None:
+            return render_template ('signuppage.html')
+        else: 
+            return render_template ('feed.html')
+    else:
+        return render_template('login.html')  
+
+    
+# LOG OUT
+
+@app.route('/logout')
+
+def logout():
+    session.clear()
+    return redirect('/')
+    
 #s def feed():
 #     if request.method == "POST":
 #         #take in the info they gave us, check if username is taken, if username is available then put into a database of users
